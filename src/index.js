@@ -28,6 +28,7 @@ var dataset = [
 ];
 let width = 600;
 let height = 400;
+let sortAscending = true;
 
 let key = d => d.key;
 
@@ -85,12 +86,19 @@ function App() {
       .on("mouseover", (d, i, nodes) => {
         let currentElement = d3.select(nodes[i]);
         currentElement.attr("fill", d => {
-          return `rgb(${d.value * 10}, 0, ${d.value * 25})`;
+          return `rgb(${d.value * 8}, 0, ${d.value * 25})`;
         });
       })
       .on("mouseout", (d, i, nodes) => {
         let currentElement = d3.select(nodes[i]);
-        currentElement.attr("fill", fillBarColor);
+        currentElement
+          .transition("resetBarColor")
+          .duration(250)
+          .attr("fill", fillBarColor);
+      })
+      .on("click", () => {
+        sortAscending = !sortAscending;
+        sort(sortAscending);
       })
       .attr("x", getPositionX)
       .attr("y", getYCoordinate)
@@ -295,6 +303,34 @@ function App() {
         .attr("x", -xScale.bandwidth())
         .remove();
     });
+  }
+
+  function sort(isAscending = true) {
+    svg
+      .selectAll("rect")
+      .sort((a, b) => {
+        return isAscending
+          ? d3.ascending(a.value, b.value)
+          : d3.descending(a.value, b.value);
+      })
+      .transition()
+      .duration(1000)
+      .attr("x", (d, i) => {
+        return xScale(i);
+      });
+
+    svg
+      .selectAll("text")
+      .sort((a, b) => {
+        return isAscending
+          ? d3.ascending(a.value, b.value)
+          : d3.descending(a.value, b.value);
+      })
+      .transition()
+      .duration(1000)
+      .attr("x", (d, i) => {
+        return xScale(i) + xScale.bandwidth() / 2;
+      });
   }
 
   return (
