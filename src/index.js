@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import ReactDOM from "react-dom";
+import LineGraph from "./line-graph";
 import * as d3 from "d3";
 
 import "./styles.css";
@@ -83,6 +84,7 @@ function App() {
     newBars
       .enter()
       .append("rect")
+
       .on("mouseover", (d, i, nodes) => {
         let currentElement = d3.select(nodes[i]);
         currentElement.attr("fill", d => {
@@ -104,7 +106,11 @@ function App() {
       .attr("y", getYCoordinate)
       .attr("width", setBarWidth)
       .attr("height", setBarHeight)
-      .attr("fill", fillBarColor);
+      .attr("fill", fillBarColor)
+      .append("title")
+      .text(d => {
+        return d.value;
+      });
   }
 
   function addDataLabels(data) {
@@ -314,7 +320,10 @@ function App() {
           : d3.descending(a.value, b.value);
       })
       .transition()
-      .duration(1000)
+      .delay((d, i) => {
+        return i * 50;
+      })
+      .duration(500)
       .attr("x", (d, i) => {
         return xScale(i);
       });
@@ -327,7 +336,10 @@ function App() {
           : d3.descending(a.value, b.value);
       })
       .transition()
-      .duration(1000)
+      .delay((d, i) => {
+        return i * 50;
+      })
+      .duration(500)
       .attr("x", (d, i) => {
         return xScale(i) + xScale.bandwidth() / 2;
       });
@@ -338,6 +350,7 @@ function App() {
       <button className="update">Update</button>
       <button className="add">Add Data</button>
       <button className="remove">Remove Data</button>
+      <LineGraph />
     </div>
   );
 }
